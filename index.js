@@ -54,8 +54,8 @@ async function scrapePost() {
     return {title, rating, original_price, price}
 }
 
-async function scrapePosts() {
-    const response = await axios(URL_ALL);
+async function scrapePosts(url = URL_ALL, posts = []) {
+    const response = await axios(url);
     const html = response.data;
     const $ = cheerio.load(html);
 
@@ -68,9 +68,7 @@ async function scrapePosts() {
     
     const data = JSON.parse(jsonRaw);
 
-    let posts = [];
-
-    let results = data.pageState.initialState.results;
+    let results = data.pageState.initialState?.results ?? [];
 
     results.forEach(item => {
         if (!item.polycard || !item.polycard.components || !item.state == 'VISIBLE') return;
@@ -116,9 +114,12 @@ async function scrapePosts() {
         posts.push(card);
     });
 
-    // Exemplo de paginação:
-    // const pagination = data.pageState.initialState.pagination;
-    // return data;
+    const nextPage = data.pageState.initialState?.pagination?.next_page?.url ?? null;
+
+    if (nextPage) {
+        return scrapePosts(nextPage, posts);
+    }
+
     return posts;
 }
 
