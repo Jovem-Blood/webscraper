@@ -3,36 +3,33 @@ const cheerio = require("cheerio");
 const express = require("express");
 
 const app = express();
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.static("public"));
+
 const PORT = 3000;
 
-const URL = "https://www.mercadolivre.com.br/cadeira-de-escritorio-ergonmica-b500-suporte-lombar-cabeca-cor-preto-material-do-estofamento-malha/p/MLB46220740?pdp_filters=item_id%3AMLB5329836232#origin%3Dshare%26sid%3Dshare%26wid%3DMLB5329836232";
-const URL_ALL = "https://lista.mercadolivre.com.br/cadeira-ergonomica#D[A:cadeira%20ergonomica,L:undefined]&origin=UNKNOWN&as.comp_t=SUG&as.comp_v=%0A&as.comp_id=HIS"
+app.post("/scrape", async (req, res) => {
+    const query = req.body.query;
 
-
-app.get("/post", async(req, res) => {
     try {
-        const post = await scrapePost();
-        res.status(200).json({post})
-    } catch {
-        res.status(500).json({
-            message: "Erro na requisição do post"
-        })
-    }
-})
+        if (query.startsWith("http")) {
+            const post = await scrapePost(query);
+            return res.json({ type: "single", data: post });
+        }
 
-app.get("/posts", async(req, res) => {
-    try {
-        const posts = await scrapePosts();
-        res.status(200).json({posts})
-    } catch {
-        res.status(500).json({
-            message: "Erro na requisição dos posts"
-        })
-    }
-})
+        const searchUrl = `https://lista.mercadolivre.com.br/${encodeURIComponent(query)}`;
+        const posts = await scrapePosts(searchUrl);
+        return res.json({ type: "list", data: posts });
 
-async function scrapePost() {
-    const response = await axios(URL);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Erro ao processar scrape" });
+    }
+});
+
+async function scrapePost(url) {
+    const response = await axios(url);
     const html = response.data;
     const $ = cheerio.load(html);
 
@@ -54,7 +51,7 @@ async function scrapePost() {
     return {title, rating, original_price, price}
 }
 
-async function scrapePosts(url = URL_ALL, posts = []) {
+async function scrapePosts(url, posts = []) {
     const response = await axios(url);
     const html = response.data;
     const $ = cheerio.load(html);
