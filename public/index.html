@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web Scraper</title>
+    <script src="index.js" defer></script>
 </head>
 <body>
     <h1>Scraper Mercado Livre</h1>
@@ -16,25 +17,9 @@
     <hr>
 
     <pre id="resultado"></pre>
-
-    <script>
-        const form = document.querySelector("form");
-        const resultado = document.querySelector("#resultado");
-
-        form.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            const queryValue = document.querySelector("input[name='query']").value;
-
-            const response = await fetch("/scrape", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ query: queryValue })
-            });
-
-            const data = await response.json();
-            resultado.textContent = JSON.stringify(data, null, 2);
-        });
-    </script>
+    <div>
+        <button id="prevPage">Anterior</button>
+        <button id="nextPage">Próxima</button>
+    </div>
 </body>
 </html>

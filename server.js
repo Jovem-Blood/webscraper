@@ -105,7 +105,7 @@ app.post("/scrape", async (req, res) => {
         let url;
         let pageData;
 
-        if (query.startsWith("http")) {
+        if (query.includes("MLB")) {
             url = query;
             pageData = await scrapeProduct(url);
         } else {
