@@ -121,6 +121,18 @@ app.post("/scrape", async (req, res) => {
     }
 });
 
+app.post("/scrape-page", async (req, res) => {
+    const pageUrl = req.body.query;
+
+    try {
+        const pageData = await scrapeProducts(pageUrl);
+        res.json(pageData);
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Erro ao processar scrape da página" });
+    }
+});
+
 app.listen(PORT, () => {
   console.log(`server listening on port ${PORT}`);
 });

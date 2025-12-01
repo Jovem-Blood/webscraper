@@ -8,8 +8,8 @@ var next_pageUrl = null;
 var prev_pageUrl = null;
 atualizarBotoes();
 
-async function carregarPagina(query) {
-    const response = await fetch("/scrape", {
+async function carregarPagina(query, rota) {
+    const response = await fetch(rota, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query })
@@ -31,17 +31,17 @@ function atualizarBotoes() {
 next_pageButton.addEventListener("click", async () => {
     if (!next_pageUrl) return;
 
-    await carregarPagina(next_pageUrl);
+    await carregarPagina(next_pageUrl, "/scrape-page");
 });
 
 prev_pageButton.addEventListener("click", async () => {
     if (!prev_pageUrl) return;
 
-    await carregarPagina(prev_pageUrl);
+    await carregarPagina(prev_pageUrl, "/scrape-page");
 });
 
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const queryValue = document.querySelector("input[name='query']").value;
-    await carregarPagina(queryValue);
+    await carregarPagina(queryValue, "/scrape");
 });
