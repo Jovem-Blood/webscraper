@@ -52,8 +52,10 @@ async function scrapeProducts(url) {
 
     let results = data.pageState.initialState?.results ?? [];
 
+    let regex = /(https?:\/\/)?click1\.mercadolivre\.com\.br/;
+    
     const posts = results
-        .filter(item => item.polycard && item.state === "VISIBLE")
+        .filter(item => item.polycard && item.state === "VISIBLE" && !regex.test(item.polycard.metadata?.url))
         .map(item => {
             let card = {
                 url: item.polycard.metadata?.url ?? null,
