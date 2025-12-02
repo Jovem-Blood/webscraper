@@ -37,12 +37,19 @@ async function fetchPage(url) {
 async function scrapeProduct(url) {
     const data = await fetchPage(url);
     if (!data) return null;
-
-    return {
+    
+    result = {
+        url: data.pageState.initialState.components.share.permalink,
         title: data.pageState.initialState.components.header.title,
         rating: data.pageState.initialState.components.header.reviews.rating,
-        original_price: data.pageState.initialState.components.price.price.original_value,
-        price: data.pageState.initialState.components.price.price.value
+        rating_text: data.pageState.initialState.components.header.subtitle,
+        current_price: data.pageState.initialState.components.price.price.value,
+        previous_price: data.pageState.initialState.components.price.price.original_value,
+        discount: data.pageState.initialState.components.track.melidata_event.event_data.credit_view_components.pricing.discount,
+    };
+
+    return {
+        posts: [result],
     };
 }
 

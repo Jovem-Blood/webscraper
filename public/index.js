@@ -1,5 +1,5 @@
 const form = document.querySelector("form");
-const resultado = document.querySelector("#resultado");
+const cards_container = document.querySelector("#cards");
 
 const next_pageButton = document.querySelector("#nextPage");
 const prev_pageButton = document.querySelector("#prevPage");
@@ -7,6 +7,18 @@ const prev_pageButton = document.querySelector("#prevPage");
 var next_pageUrl = null;
 var prev_pageUrl = null;
 atualizarBotoes();
+
+function gerarCards(posts) {
+    return posts.map(post => {
+        return `<div class="card">
+            <h3><a href="${post.url}" target="_blank">${post.title}</a></h3>
+            <p>Avaliação: ${post.rating} (${post.rating_text})</p>
+            <p>Preço Atual: R$ ${post.current_price}</p>
+            <p>Preço Anterior: R$ ${post.previous_price}</p>
+            <p>Desconto: ${post.discount}</p>
+        </div>`;        
+    })
+}
 
 async function carregarPagina(query, rota) {
     const response = await fetch(rota, {
@@ -17,7 +29,8 @@ async function carregarPagina(query, rota) {
 
     const data = await response.json();
 
-    resultado.textContent = JSON.stringify(data, null, 2);
+    const cardsHTML = gerarCards(data.posts).join("");
+    cards_container.innerHTML = cardsHTML;
     next_pageUrl = data.next_page ?? null;
     prev_pageUrl = data.prev_page ?? null;
     atualizarBotoes();
