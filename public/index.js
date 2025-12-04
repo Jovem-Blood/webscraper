@@ -11,6 +11,7 @@ atualizarBotoes();
 function gerarCards(posts) {
     return posts.map(post => {
         return `<div class="card">
+            ${post.images.map(image => `<img src="${image.url}" alt="Image ${image.id}">`).join("")}
             <h3><a href="${post.url}" target="_blank">${post.title}</a></h3>
             <p>Avaliação: ${post.rating} (${post.rating_text})</p>
             <p>Preço Atual: R$ ${post.current_price}</p>

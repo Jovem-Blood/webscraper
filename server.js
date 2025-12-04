@@ -72,7 +72,10 @@ async function scrapeProducts(url) {
                 current_price: null,
                 previous_price: null,
                 discount: null,
+                images: null,
             };
+
+            card.images = gerarImagemUrl(item.polycard.pictures.pictures || []);
 
             item.polycard.components.forEach(component => {
                 if (component?.type === "title") {
@@ -104,6 +107,13 @@ async function scrapeProducts(url) {
         next_page: data.pageState.initialState?.pagination?.next_page?.url ?? null,
         prev_page: data.pageState.initialState?.pagination?.previous_page?.url ?? null,
     };
+}
+
+function gerarImagemUrl(pictures) {
+    return pictures.map(pic => ({
+        id: pic.id,
+        url: `https://http2.mlstatic.com/D_NQ_NP_${pic.id}-O.webp`
+    }));
 }
 
 
