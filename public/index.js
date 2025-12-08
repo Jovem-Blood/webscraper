@@ -16,7 +16,20 @@ function gerarCards(posts) {
 
 
         return `<div class="card">
-            <div class="img-container">${post.images.map(image => `<img src="${image.url}" alt="Image ${image.id}">`).join("")}</div>
+            <div class="img-container" data-index="0">
+                ${post.images.map((image, i) => `
+                    <img 
+                        src="${image.url}" 
+                        alt="Image ${image.id}" 
+                        class="${i === 0 ? 'active' : ''}"
+                    >
+                `).join("")}
+
+                ${post.images.length > 1 ? `
+                    <button class="prev">‹</button>
+                    <button class="next">›</button>
+                ` : ""}
+            </div>
             <div class="content">
                 <h3 class="title"><a href="${post.url}" target="_blank">${post.title}</a></h3>
                 ${discount}
@@ -67,4 +80,23 @@ form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const queryValue = document.querySelector("input[name='query']").value;
     await carregarPagina(queryValue, "/scrape");
+});
+
+cards_container.addEventListener("click", function (e) {
+    if (!e.target.matches(".prev, .next")) return;
+
+    const container = e.target.closest(".img-container");
+    const images = container.querySelectorAll("img");
+    let index = parseInt(container.dataset.index, 10);
+
+    images[index].classList.remove("active");
+
+    if (e.target.classList.contains("next")) {
+        index = (index + 1) % images.length;
+    } else {
+        index = (index - 1 + images.length) % images.length;
+    }
+
+    images[index].classList.add("active");
+    container.dataset.index = index;
 });

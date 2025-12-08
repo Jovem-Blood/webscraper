@@ -46,6 +46,7 @@ async function scrapeProduct(url) {
         current_price: data.pageState.initialState.components.price.price.value,
         previous_price: data.pageState.initialState.components.price.price.original_value,
         discount: data.pageState.initialState.components.track.melidata_event.event_data.credit_view_components.pricing.discount,
+        images: gerarImagemUrl(data.pageState.initialState.components.gallery.pictures || []),
     };
 
     return {
