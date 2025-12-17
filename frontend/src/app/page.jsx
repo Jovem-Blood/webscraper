@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { extrairMLB } from '@/app/utils/regex';
+import { SearchBar } from './components/SearchBar';
 
 export default function Home() {
   const [query, setQuery] = useState('');
@@ -10,9 +12,15 @@ export default function Home() {
   function handleSubmit(e) {
     e.preventDefault();
 
-    if (!query.trim()) return;
+    const valor = query.trim();
+    const MLB = extrairMLB(valor);
+    if (MLB) {
+        router.push(`/produto/${MLB}?url=${encodeURIComponent(query)}`);
+        return;
+    }
 
-    router.push(`/busca/${encodeURIComponent(query)}`);
+    router.push(`/busca/${encodeURIComponent(query)}?page=1`);
+
   }
 
   return (

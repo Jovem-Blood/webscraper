@@ -27,11 +27,12 @@ async function fetchPage(url) {
     return JSON.parse(jsonRaw);
 }
 
-async function scrapeProduct(url) {
+async function scrapeProduct(url, mlb) {
     const data = await fetchPage(url);
     if (!data) return null;
     
     const result = {
+        id: mlb,
         url: data.pageState.initialState.components.share.permalink,
         title: data.pageState.initialState.components.header.title,
         rating: data.pageState.initialState.components.header.reviews.rating,
@@ -49,13 +50,7 @@ async function scrapeProduct(url) {
 
 async function scrapeProducts(url) {
     const data = await fetchPage(url);
-    if (!data) {
-        return {
-            posts: [],
-            next_page: null,
-            prev_page: null,
-        };
-    }
+    if (!data) return { posts: [] };
 
     let results = data.pageState.initialState?.results ?? [];
     let regex = /(https?:\/\/)?click1\.mercadolivre\.com\.br/;
@@ -125,23 +120,31 @@ function formatarPreco(preco) {
 export async function POST(request) {
     try {
         const body = await request.json();
-        const { query, page = 1 } = body;
-        const offset = (page - 1) * 50;
+        const { query, mlb, url, page = 1 } = body;
 
-        let url;
-        let pageData;
+        let pageData = null;
 
-        if (query.includes("MLB")) {
-            url = query;
-            pageData = await scrapeProduct(url);
-        } else {
-            url = `https://lista.mercadolivre.com.br/${decodeURIComponent(query)}`;
+        if (mlb) {
+            pageData = await scrapeProduct(url, mlb);
+        }
+
+        else if (query) {
+            const offset = (page - 1) * 50;
+
+            let url = `https://lista.mercadolivre.com.br/${decodeURIComponent(query)}`;
 
             if (offset > 0) {
                 url += `_Desde_${offset + 1}_NoIndex_True`;
             }
 
             pageData = await scrapeProducts(url);
+        }
+
+        else {
+            return NextResponse.json(
+                { error: "Parâmetros inválidos" },
+                { status: 400 }
+            );
         }
 
         return NextResponse.json(pageData);
