@@ -1,30 +1,34 @@
-import { sql } from "drizzle-orm";
+import { pgTable, serial, text, integer, timestamp} from "drizzle-orm/pg-core";
 import { user } from "./auth-schema.js";
-import { integer, sqliteTable, text, real } from "drizzle-orm/sqlite-core";
 
-export const productAlert = sqliteTable("product_alerts", {
-  id: integer("id").primaryKey(),
+export const productAlert = pgTable("product_alerts", {
+  id: serial("id").primaryKey(),
+
   productId: text("product_id").notNull(),
   productName: text("product_name").notNull(),
   productUrl: text("product_url").notNull(),
-  currentPrice: real("current_price").notNull(),
-  targetPrice: real("target_price").notNull(),
+
+  currentPrice: integer("current_price").notNull(),
+  targetPrice: integer("target_price").notNull(),
+  
   userId: text("user_id")
     .notNull()
-    .references(() => user.id),
-  createdAt: integer("created_at")
-    .notNull()
-    .default(sql`(strftime('%s','now'))`),
+    .references(() => user.id, { onDelete: "cascade" }),
+  
   isActive: integer("is_active").notNull().default(1),
+  triggeredAt: timestamp("triggered_at"),
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const historyPrice = sqliteTable("history_prices", {
-  id: integer("id").primaryKey(),
+export const historyPrice = pgTable("history_prices", {
+  id: serial("id").primaryKey(),
+
   productAlertId: integer("product_alert_id")
     .notNull()
-    .references(() => productAlert.id),
-  price: real("price").notNull(),
-  recordedAt: integer("recorded_at")
-    .notNull()
-    .default(sql`(strftime('%s','now'))`),
+    .references(() => productAlert.id, { onDelete: "cascade" }),
+
+  price: integer("price").notNull(),
+
+  recordedAt: timestamp("recorded_at").defaultNow().notNull(),
 });

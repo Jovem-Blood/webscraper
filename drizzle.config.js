@@ -4,8 +4,8 @@ import "dotenv/config";
 export default {
   schema: "./src/db/schema.js",
   out: "./src/db/migrations",
-  dialect: "sqlite",
+  dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DB_FILE_NAME,
+    url: process.env.DATABASE_URL,
   },
 };

@@ -27,10 +27,16 @@ export function Header({searchValue, onSearchChange, onSearchSubmit}) {
               <NavigationMenuItem>
                 <NavigationMenuTrigger>{user.name}</NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="flex flex-col gap-2">
+                  <ul className="flex flex-col gap-2 w-40">
                     <li>
                       <NavigationMenuLink asChild>
-                        <button onClick={logout}>Logout</button>
+                        <button className="w-full" onClick={() => router.push('/perfil')}>Perfil</button>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <button className="w-full" onClick={() => router.push('/alertas')}>Meus Alertas</button>
+                      </NavigationMenuLink>
+                      <NavigationMenuLink asChild>
+                        <button className="w-full" onClick={logout}>Logout</button>
                       </NavigationMenuLink>
                     </li>
                   </ul>
