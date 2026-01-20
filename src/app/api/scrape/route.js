@@ -1,6 +1,10 @@
+export const runtime = "nodejs";
+
 import axios from "axios";
 import * as cheerio from "cheerio";
 import { NextResponse } from "next/server";
+
+console.log("ROTA SCRAPE INICIALIZADA");
 
 async function fetchPageProduct(url) {
     const response = await axios.get(url, {
