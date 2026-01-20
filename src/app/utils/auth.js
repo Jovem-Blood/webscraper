@@ -23,8 +23,6 @@ export const auth = betterAuth({
         enabled: true, 
     },
 
-    trustedOrigins: process.env.NODE_ENV === "production"
-    ? process.env.BETTER_TRUSTED_ORIGINS || []
-    : ["http://localhost:3000"]
+    trustedOrigins: process.env.BETTER_TRUSTED_ORIGINS
     
 });
