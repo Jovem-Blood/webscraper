@@ -146,6 +146,7 @@ export async function POST(request) {
         const body = await request.json();
         const { query, mlb, url, page = 1 } = body;
 
+        console.log("Parâmetros recebidos:", { query, mlb, url, page });
         let pageData = null;
 
         if (mlb) {
@@ -162,6 +163,7 @@ export async function POST(request) {
                 urlStr += `_Desde_${offset + 1}_NoIndex_True`;
             }
 
+            console.log("URL de busca construída:", urlStr);
             pageData = await scrapeProducts(urlStr);
         }
 
