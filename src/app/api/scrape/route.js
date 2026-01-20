@@ -1,26 +1,42 @@
 export const runtime = "nodejs";
 
-import axios from "axios";
 import * as cheerio from "cheerio";
 import { NextResponse } from "next/server";
 
-const http = axios.create({
-    timeout: 15000,
-    headers: {
-        "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept":
-            "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-        "Accept-Language": "pt-BR,pt;q=0.9",
-        "Referer": "https://www.google.com/",
-        "Cache-Control": "no-cache",
-        "Pragma": "no-cache",
-    },
-});
+const fetchWithHeaders = async (url) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+    try {
+        const response = await fetch(url, {
+            signal: controller.signal,
+            headers: {
+                "User-Agent": process.env.SCRAPER_USER_AGENT || 
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": process.env.SCRAPER_ACCEPT || 
+                    "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                "Accept-Language": process.env.SCRAPER_ACCEPT_LANGUAGE || "pt-BR,pt;q=0.9",
+                "Referer": process.env.SCRAPER_REFERER || "https://www.google.com/",
+                "Cache-Control": process.env.SCRAPER_CACHE_CONTROL || "no-cache",
+                "Pragma": process.env.SCRAPER_PRAGMA || "no-cache",
+            },
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.text();
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+};
 
 async function fetchPageProduct(url) {
-    const response = await http.get(url, { responseType: "text" });
-    const html = response.data;
+    const html = await fetchWithHeaders(url);
     const $ = cheerio.load(html);
 
     const jsonRaw = $('#__PRELOADED_STATE__').html();
@@ -39,8 +55,7 @@ async function fetchPageProduct(url) {
 }
 
 async function fetchPageProducts(url) {
-    const response = await http.get(url, { responseType: "text" });
-    const html = response.data;
+    const html = await fetchWithHeaders(url);
     
     const match = html.match(/_n\.ctx\.r\s*=\s*({[\s\S]*?})\s*;/);
 
